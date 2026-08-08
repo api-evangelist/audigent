@@ -1,18 +1,100 @@
 aid: audigent
 name: Audigent
-description: 'Audigent is a company surfaced via the API Evangelist harvest backlog (source: secondary-market)
-  and added to the network as a stub for full-pipeline profiling.'
+description: 'Audigent is a data activation, curation and identity platform for digital
+  advertising, acquired by Experian in December 2024 and now operated as part of Experian
+  Marketing Services. Its products include the Hadron ID cookieless identifier, the
+  SmartPMP, ContextualPMP and CognitivePMP private-marketplace suites, a first-party
+  data platform for publishers and advertisers, and the 1st Unit rich-media format.
+  Audigent''s public technical surface is not a documented REST developer program:
+  it is a set of live ad-tech identity, segment and analytics endpoints on the ad.gt
+  and hadronid.net domains, reached through first-party open-source Prebid.js modules
+  (hadronIdSystem, hadronRtdProvider, hadronAnalyticsAdapter) that Audigent authors
+  and maintains upstream in the Prebid.js project. Audigent is IAB Europe TCF Global
+  Vendor List vendor 561 and publishes a machine-readable device-storage disclosure.'
+image: https://avatars.githubusercontent.com/u/16336664?v=4
 url: https://raw.githubusercontent.com/api-evangelist/audigent/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:secondary-market
-x-tier: stub
-x-tier-reason: harvest
 specificationVersion: '0.20'
 created: '2026-08-06'
 modified: '2026-08-06'
 tags:
 - Company
-apis: []
+- Advertising
+- AdTech
+- Data
+- Identity
+- Programmatic
+- Audience
+- Marketing
+- Privacy
+- Prebid
+- Header Bidding
+- Data Curation
+apis:
+- name: Hadron ID API
+  description: 'Public, anonymous identity-resolution endpoint that returns Audigent''s
+    cookieless Hadron ID (plus hadronIdv2 and the legacy haloId) for the calling browser.
+    Called by the Prebid.js hadronIdSystem user-id submodule. Accepts a partner_id
+    identifier and consent signals (gdpr, gdprString, us_privacy, gpp, gpp_sid) as
+    query parameters and responds with JSON. No OpenAPI is published; the request
+    contract is legible in the open-source Prebid.js module source.'
+  humanURL: https://docs.prebid.org/dev-docs/modules/userid-submodules/hadron.html
+  baseURL: https://id.hadron.ad.gt/api/v1
+  tags:
+  - Identity
+  - AdTech
+  - Prebid
+  properties:
+  - type: Documentation
+    url: https://docs.prebid.org/dev-docs/modules/userid-submodules/hadron.html
+  - type: SourceCode
+    url: https://github.com/prebid/Prebid.js/blob/master/modules/hadronIdSystem.js
+- name: Hadron Real-Time Data (RTD) API
+  description: 'Segment and real-time-data endpoint returning an OpenRTB ortb2 fragment
+    used to enrich a Prebid auction with Audigent audience segments and contextual
+    signals. Backed by the hadronRtdProvider Prebid.js module and the hadron.js loader
+    served from cdn.hadronid.net. Requires an Audigent-issued numeric partnerId.'
+  humanURL: https://docs.prebid.org/dev-docs/modules/hadronRtdProvider.html
+  baseURL: https://seg.hadron.ad.gt/api/v1
+  tags:
+  - AdTech
+  - Audience
+  - Prebid
+  properties:
+  - type: Documentation
+    url: https://docs.prebid.org/dev-docs/modules/hadronRtdProvider.html
+  - type: SourceCode
+    url: https://github.com/prebid/Prebid.js/blob/master/modules/hadronRtdProvider.js
+- name: Hadron Analytics API
+  description: 'Analytics collection endpoint for the hadronAnalyticsAdapter Prebid.js
+    analytics adapter. Receives auction lifecycle events (auctionInit, auctionEnd,
+    bidWon and related) keyed to an Audigent partnerId. Accepts GET, POST and OPTIONS;
+    no public request schema is published.'
+  humanURL: https://docs.prebid.org/dev-docs/analytics/audigent.html
+  baseURL: https://analytics.hadron.ad.gt/api/v1
+  tags:
+  - Analytics
+  - AdTech
+  - Prebid
+  properties:
+  - type: Documentation
+    url: https://docs.prebid.org/dev-docs/analytics/audigent.html
+  - type: SourceCode
+    url: https://github.com/prebid/Prebid.js/blob/master/modules/hadronAnalyticsAdapter.js
+- name: Audigent Platform API
+  description: 'Authenticated platform API behind the Audigent admin console. The host
+    is live (gunicorn/Django) but every anonymous request 302s to the admin.audigent.com
+    login, and no public reference, OpenAPI or developer portal is published for it.
+    Access is customer/partner-only.'
+  humanURL: https://admin.audigent.com/
+  baseURL: https://api.audigent.com
+  tags:
+  - Platform
+  - AdTech
+  properties:
+  - type: Login
+    url: https://admin.audigent.com/
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -20,4 +102,51 @@ maintainers:
   email: info@apis.io
 common:
 - type: Website
+  url: https://audigent.com/
+- type: Documentation
+  url: https://docs.prebid.org/dev-docs/modules/hadronRtdProvider.html
+- type: APIReference
+  url: https://docs.prebid.org/dev-docs/modules/userid-submodules/hadron.html
+- type: GettingStarted
+  url: https://docs.prebid.org/dev-docs/modules/userid-submodules/hadron.html
+- type: GitHubOrganization
+  url: https://github.com/AuDigent
+- type: Blog
+  url: https://audigent.com/blog/
+- type: Support
+  url: https://audigent.com/contact-us/
+- type: Login
+  url: https://admin.audigent.com/
+- type: PrivacyPolicy
+  url: https://audigent.com/privacypolicy/
+- type: PlatformPrivacyPolicy
+  url: https://audigent.com/platform-privacy-policy/
+- type: CookiePolicy
+  url: https://audigent.com/cookie-policy/
+- type: PrivacyCenter
+  url: https://audigent.com/privacy-center/
+- type: Authentication
+  url: authentication/audigent-authentication.yml
+- type: Conventions
+  url: conventions/audigent-conventions.yml
+- type: Lifecycle
+  url: lifecycle/audigent-lifecycle.yml
+- type: Deprecation
+  url: lifecycle/audigent-lifecycle.yml
+- type: Conformance
+  url: conformance/audigent-conformance.yml
+- type: Compliance
+  url: conformance/audigent-conformance.yml
+- type: Components
+  url: components/audigent-components.yml
+- type: DomainSecurity
+  url: security/audigent-domain-security.yml
+- type: LLMsTxt
+  url: llms/audigent-llms.txt
+- type: SecondaryMarket
   url: https://forgeglobal.com/audigent_stock/
+x-enrichment:
+  date: '2026-08-06'
+  status: enriched
+  artifacts_added: 10
+  pass: local-v1
