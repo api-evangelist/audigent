@@ -1,0 +1,69 @@
+{
+    "disclosures": [
+        {
+            "identifier": "au_id",
+            "type": "cookie",
+            "maxAgeSeconds": 31536000,
+            "cookieRefresh": true,
+            "domains": [
+                "*.ad.gt"
+            ],
+            "purposes": [
+                1, 2, 3, 4, 9, 10
+            ]
+        },
+        {
+            "identifier": "au_idmatch",
+            "type": "cookie",
+            "maxAgeSeconds": 31536000,
+            "cookieRefresh": true,
+            "domains": [
+                "*.ad.gt"
+            ],
+            "purposes": [
+                1, 2, 3, 4, 9, 10
+            ]
+        },
+        {
+            "identifier": "au/sid",
+            "type": "web",
+            "maxAgeSeconds": null,
+            "domains": [
+                "*"
+            ],
+            "purposes": [
+                1, 2, 3, 4, 9, 10
+            ]
+        },
+        {
+            "identifier": "_au_1d",
+            "type": "cookie",
+            "maxAgeSeconds": 31536000,
+            "cookieRefresh": true,
+            "domains": [
+                "*"
+            ],
+            "purposes": [
+                1, 2, 3, 4, 9, 10
+            ]
+        },
+        {
+            "identifier": "_au_last_seen*",
+            "type": "cookie",
+            "maxAgeSeconds": 31536000,
+            "cookieRefresh": true,
+            "domains": [
+                "*"
+            ],
+            "purposes": [
+                1, 2, 3, 4, 9, 10
+            ]
+        }
+    ],
+    "domains": [
+        {
+            "domain": "*.ad.gt",
+            "use": "Audigent Services"
+        }
+    ]
+}

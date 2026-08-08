@@ -1,0 +1,146 @@
+generated: '2026-08-06'
+method: searched
+source: >-
+  https://docs.prebid.org/dev-docs/modules/userid-submodules/hadron.html ;
+  https://docs.prebid.org/dev-docs/modules/hadronRtdProvider.html ;
+  https://github.com/prebid/Prebid.js/blob/master/modules/hadronIdSystem.js ;
+  https://github.com/prebid/Prebid.js/blob/master/modules/hadronRtdProvider.js ;
+  https://github.com/prebid/Prebid.js/blob/master/modules/hadronAnalyticsAdapter.js ;
+  live anonymous probes 2026-08-06
+
+summary: >-
+  Audigent does not publish an API style guide. The conventions below are read
+  off the first-party open-source Prebid.js modules Audigent authors and
+  maintains, plus live anonymous probes of the endpoints those modules call.
+  This is a browser-side ad-tech surface, not a server-to-server REST product:
+  the calls are idempotent GETs with query parameters, there is no request body
+  schema, no pagination, no rate-limit signalling and no error envelope.
+
+transport:
+  protocol: HTTPS only
+  methods_observed:
+  - GET
+  - POST
+  - OPTIONS
+  allow_header_observed: 'POST, OPTIONS, GET'
+  content_type: application/json
+  edge: 'Cloudflare — server: cloudflare and cf-ray headers present on all ad.gt hosts'
+
+request_style:
+  shape: query-parameter GET; no request body on the identity or RTD calls
+  parameters:
+  - name: partner_id
+    required: true
+    meaning: Audigent-issued numeric partner/tenant identifier
+  - name: _it
+    required: false
+    meaning: integration type; Prebid modules send `prebid`
+  - name: src
+    required: false
+    meaning: call site; `id` when invoked from the user-id module getId()
+  - name: t
+    required: false
+    meaning: internal call flag set to 1 by the user-id module
+  - name: domain
+    required: false
+    meaning: document.location.hostname of the calling page
+  - name: debug
+    required: false
+    meaning: set to 1 when Prebid debug config is enabled
+
+consent_signalling:
+  note: >-
+    Consent is the load-bearing convention on this surface — it is passed on
+    every call and is what the endpoint gates on, in place of authentication.
+  parameters:
+  - name: gdpr
+    values: '1 | 0'
+    source: Prebid gdprDataHandler.getConsentData().gdprApplies
+  - name: gdprString
+    encoding: URL-encoded IAB TCF consent string
+  - name: us_privacy
+    encoding: URL-encoded IAB US Privacy (USP/CCPA) string
+  - name: gpp
+    encoding: URL-encoded IAB Global Privacy Platform string
+  - name: gpp_sid
+    encoding: URL-encoded GPP applicable section IDs
+
+response_shape:
+  format: JSON object, flat, no envelope
+  identity_fields:
+  - hadronId
+  - hadronIdv2
+  - haloId
+  - cf
+  rtd_fields:
+  - rtd.ortb2
+  note: >-
+    The RTD endpoint returns an OpenRTB 2.x `ortb2` fragment for merging into the
+    Prebid auction, which is the real interoperability contract on this surface —
+    OpenRTB, not a bespoke Audigent schema. The legacy cookie-match endpoint at
+    ids.ad.gt/api/v1/halo_match answers 202 with a 43-byte image/gif tracking
+    pixel rather than JSON.
+
+cors:
+  access_control_allow_origin: '*'
+  access_control_allow_methods: GET, POST, OPTIONS
+  access_control_allow_headers: '*'
+
+idempotency:
+  supported: false
+  note: >-
+    No idempotency key, no Idempotency-Key header, no replay-safe write surface.
+    The public endpoints are read/beacon calls; there is no documented mutating
+    operation to make idempotent. No `type: Idempotency` pointer is emitted,
+    because Audigent does not offer one.
+
+pagination:
+  supported: false
+  note: No collection endpoint is publicly exposed, so there is no pagination style.
+
+rate_limits:
+  documented: false
+  note: >-
+    No rate-limit documentation and no RateLimit/X-RateLimit/Retry-After headers
+    observed on any anonymous probe. rate-limits/ is correctly absent.
+
+request_tracing:
+  provider_request_id: false
+  note: >-
+    No provider request-id header. The only correlatable value is Cloudflare's
+    `cf-ray`, which is edge infrastructure and not an Audigent support handle.
+
+versioning:
+  style: URI path segment
+  observed:
+  - https://id.hadron.ad.gt/api/v1/pbhid
+  - https://seg.hadron.ad.gt/api/v1/rtd
+  - https://analytics.hadron.ad.gt/api/v1/analytics
+  - https://uid2.hadron.ad.gt/v1/hadron.json
+  current: v1
+  note: >-
+    Every public endpoint sits under /api/v1 (or /v1). No version negotiation
+    header, no dated versions, no published version policy.
+  see_also: lifecycle/audigent-lifecycle.yml
+
+errors:
+  envelope: >-
+    Non-uniform. The a.ad.gt host returns a JSON body shaped
+    {"code":404,"name":"Not Found","description":"..."} (a Flask/Werkzeug default),
+    while the hadron.ad.gt hosts return bare 404s. Not RFC 9457; no
+    application/problem+json anywhere.
+  documented_catalog: false
+  note: >-
+    No error reference is published and there is no OpenAPI to derive 4xx/5xx
+    responses from, so errors/ is correctly absent rather than fabricated.
+
+client_libraries:
+  note: >-
+    The supported integration path is not an SDK but a build-time Prebid.js
+    module. See components/audigent-components.yml.
+
+cross_links:
+  authentication: authentication/audigent-authentication.yml
+  lifecycle: lifecycle/audigent-lifecycle.yml
+  conformance: conformance/audigent-conformance.yml
+  components: components/audigent-components.yml

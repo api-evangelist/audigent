@@ -1,0 +1,52 @@
+{
+  "x-source": "https://vendor-list.consensu.org/v3/vendor-list.json",
+  "x-fetched": "2026-08-06",
+  "gvlSpecificationVersion": 3,
+  "vendorListVersion": 171,
+  "tcfPolicyVersion": 5,
+  "lastUpdated": "2026-08-06T16:00:19Z",
+  "vendor": {
+    "id": 561,
+    "name": "AuDigent",
+    "purposes": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      9,
+      10
+    ],
+    "legIntPurposes": [],
+    "flexiblePurposes": [],
+    "specialPurposes": [],
+    "features": [],
+    "specialFeatures": [],
+    "overflow": {
+      "httpGetLimit": 128
+    },
+    "cookieMaxAgeSeconds": 31536000,
+    "usesCookies": true,
+    "cookieRefresh": true,
+    "urls": [
+      {
+        "langId": "en",
+        "privacy": "https://audigent.com/platform-privacy-policy",
+        "legIntClaim": "https://audigent.com/privacy-center/"
+      }
+    ],
+    "usesNonCookieAccess": true,
+    "dataRetention": {
+      "stdRetention": 60,
+      "purposes": {},
+      "specialPurposes": {}
+    },
+    "dataDeclaration": [
+      1,
+      3,
+      6,
+      8
+    ],
+    "deviceStorageDisclosureUrl": "https://p.ad.gt/static/iab_tcf.json"
+  }
+}

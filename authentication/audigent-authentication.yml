@@ -1,0 +1,91 @@
+generated: '2026-08-06'
+method: searched
+source: >-
+  https://docs.prebid.org/dev-docs/modules/hadronRtdProvider.html ;
+  https://github.com/prebid/Prebid.js/blob/master/modules/hadronIdSystem.js ;
+  live anonymous probes of id.hadron.ad.gt / seg.hadron.ad.gt / api.audigent.com
+
+summary: >-
+  Audigent publishes no OpenAPI and no developer auth reference. Its public
+  ad-tech endpoints are unauthenticated by design — they are browser-side
+  identity and segment calls that carry a non-secret numeric partner_id rather
+  than a credential. The authenticated surface is the platform console at
+  admin.audigent.com, whose API host 302s every anonymous request to a login.
+  There is no API-key issuance page, no OAuth surface, and no documented token.
+
+schemes:
+- id: partner_id
+  type: identifier
+  in: query
+  name: partner_id
+  secret: false
+  applies_to:
+  - https://id.hadron.ad.gt/api/v1/pbhid
+  - https://seg.hadron.ad.gt/api/v1/rtd
+  - https://analytics.hadron.ad.gt/api/v1/analytics
+  - https://cdn.hadronid.net/hadron.js
+  description: >-
+    Numeric Audigent Partner ID, issued by Audigent to a publisher or partner
+    during onboarding and passed as a query parameter. The Prebid docs call it
+    required for the RTD module ("This is the Audigent Partner ID obtained from
+    Audigent"), but it is a tenant identifier embedded in client-side page
+    JavaScript, not a secret — it is visible to anyone viewing the page source.
+  x-evidence:
+    fetched: '2026-08-06'
+    url: https://id.hadron.ad.gt/api/v1/pbhid?partner_id=0&_it=prebid&t=1&src=id&domain=example.com
+    http_status: 200
+    note: >-
+      Returned application/json with a freshly minted hadronId for an anonymous
+      caller with partner_id=0 and no credential of any kind. Response values are
+      per-browser identifiers and are deliberately not recorded here.
+
+- id: console_session
+  type: session
+  in: cookie
+  secret: true
+  applies_to:
+  - https://api.audigent.com
+  - https://admin.audigent.com
+  description: >-
+    Customer/partner console login. The API host runs gunicorn behind a Django
+    stack and issues a 302 to https://admin.audigent.com for anonymous requests;
+    response headers advertise session cookie handling (Vary: Origin, Cookie),
+    X-Frame-Options DENY and Cross-Origin-Opener-Policy same-origin. No public
+    sign-up, no documented token endpoint, no OAuth metadata.
+  x-evidence:
+    fetched: '2026-08-06'
+    url: https://api.audigent.com/
+    http_status: 302
+    location: https://admin.audigent.com
+
+no_oauth: true
+no_oauth_reason: >-
+  No oauth2 or openIdConnect surface exists. /.well-known/oauth-authorization-server
+  and /.well-known/openid-configuration returned 404 on every Audigent and Hadron
+  host probed (id.hadron.ad.gt, analytics.hadron.ad.gt, seg.hadron.ad.gt,
+  cdn.hadronid.net, api.audigent.com). scopes/ is therefore correctly absent.
+
+cors:
+  access_control_allow_origin: '*'
+  access_control_allow_methods: GET, POST, OPTIONS
+  access_control_allow_headers: '*'
+  observed_on: https://id.hadron.ad.gt/api/v1/pbhid
+  note: >-
+    Fully open CORS on the identity endpoint, consistent with a surface intended
+    to be called from any publisher page.
+
+consent_as_access_control:
+  note: >-
+    In place of authentication, the public endpoints gate behavior on privacy
+    consent signals passed by the page. See conformance/audigent-conformance.yml.
+  parameters:
+  - gdpr
+  - gdprString
+  - us_privacy
+  - gpp
+  - gpp_sid
+
+gaps:
+- No published authentication documentation on any Audigent-owned host.
+- No API-key or credential self-service; partner IDs are issued via sales/onboarding.
+- No machine-readable security scheme (no OpenAPI securitySchemes to derive from).

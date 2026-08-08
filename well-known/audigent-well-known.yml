@@ -1,0 +1,111 @@
+generated: '2026-08-06'
+method: probed
+source: live anonymous HTTP probes, 2026-08-06
+
+summary: >-
+  Zero hits. Every /.well-known/ path was probed on every Audigent and Hadron
+  host and none resolved. NO `WellKnown`, `SecurityTxt` or `APICatalog` pointer
+  is emitted in apis.yml — this file is the negative record of the probe, not a
+  claim of coverage.
+
+soft_404_warning: >-
+  audigent.com and dev.audigent.com answer HTTP 200 with text/html for EVERY
+  path, redirecting to /index.html. A 200 from those two hosts is not evidence of
+  anything. Every probe below was diffed against a control path
+  (/zzz-control-9999) that returns the identical 200 -> /index.html signature,
+  and only responses that differ from the control are treated as real. The
+  hadron.ad.gt, cdn.hadronid.net and api.audigent.com hosts return honest 404s.
+
+controls:
+- host: audigent.com
+  url: https://audigent.com/zzz-control-9999
+  status: 200
+  effective_url: https://audigent.com/index.html
+  verdict: soft-404 — all 200s from this host are unreliable
+- host: dev.audigent.com
+  url: https://dev.audigent.com/zzz-control-not-real-9999
+  status: 200
+  effective_url: https://dev.audigent.com/index.html
+  verdict: soft-404 — this host is a staging mirror of the marketing site, not a developer portal
+
+probes:
+- host: audigent.com
+  paths:
+  - {path: /.well-known/security.txt, status: 200, verdict: soft-404, file: null}
+  - {path: /llms.txt, status: 200, verdict: soft-404, file: null}
+- host: dev.audigent.com
+  paths:
+  - {path: /openapi.json, status: 200, verdict: soft-404, file: null}
+  - {path: /llms.txt, status: 200, verdict: soft-404, file: null}
+  - {path: /sitemap.xml, status: 200, verdict: soft-404, file: null}
+- host: id.hadron.ad.gt
+  paths:
+  - {path: /.well-known/security.txt, status: 404, file: null}
+  - {path: /.well-known/api-catalog, status: 404, file: null}
+  - {path: /.well-known/oauth-authorization-server, status: 404, file: null}
+  - {path: /.well-known/openid-configuration, status: 404, file: null}
+  - {path: /.well-known/agent-card.json, status: 404, file: null}
+  - {path: /.well-known/agent.json, status: 404, file: null}
+  - {path: /openapi.json, status: 404, file: null}
+  - {path: /swagger.json, status: 404, file: null}
+  - {path: /api-docs, status: 404, file: null}
+  - {path: /llms.txt, status: 404, file: null}
+- host: seg.hadron.ad.gt
+  paths:
+  - {path: /.well-known/security.txt, status: 404, file: null}
+  - {path: /.well-known/api-catalog, status: 404, file: null}
+  - {path: /.well-known/agent-card.json, status: 404, file: null}
+  - {path: /.well-known/agent.json, status: 404, file: null}
+  - {path: /openapi.json, status: 404, file: null}
+  - {path: /llms.txt, status: 404, file: null}
+- host: analytics.hadron.ad.gt
+  paths:
+  - {path: /.well-known/security.txt, status: 530, file: null}
+  - {path: /.well-known/agent-card.json, status: 530, file: null}
+  - {path: /.well-known/agent.json, status: 530, file: null}
+  - {path: /openapi.json, status: 530, file: null}
+  - {path: /llms.txt, status: 530, file: null}
+  note: >-
+    530 is a Cloudflare origin error returned for unrouted paths on this host;
+    the documented endpoint /api/v1/analytics itself answers 200.
+- host: cdn.hadronid.net
+  paths:
+  - {path: /.well-known/security.txt, status: 404, file: null}
+  - {path: /.well-known/agent-card.json, status: 404, file: null}
+  - {path: /.well-known/agent.json, status: 404, file: null}
+  - {path: /openapi.json, status: 403, file: null}
+  - {path: /swagger.json, status: 403, file: null}
+  - {path: /llms.txt, status: 404, file: null}
+- host: api.audigent.com
+  paths:
+  - {path: /.well-known/security.txt, status: 404, file: null}
+  - {path: /.well-known/api-catalog, status: 404, file: null}
+  - {path: /.well-known/oauth-authorization-server, status: 404, file: null}
+  - {path: /.well-known/openid-configuration, status: 404, file: null}
+  - {path: /.well-known/agent-card.json, status: 404, file: null}
+  - {path: /.well-known/agent.json, status: 404, file: null}
+  - {path: /openapi.json, status: 404, file: null}
+  - {path: /swagger.json, status: 404, file: null}
+  - {path: /api-docs, status: 404, file: null}
+  - {path: /llms.txt, status: 404, file: null}
+  - {path: /, status: 302, location: https://admin.audigent.com, file: null}
+
+hits: []
+
+the_one_machine_readable_document:
+  note: >-
+    Audigent does publish exactly one first-party machine-readable document, but
+    it is not at a /.well-known/ path — it is the IAB TCF device-storage
+    disclosure, discovered via the IAB Europe Global Vendor List entry for vendor
+    561 rather than by well-known probing. It is captured under conformance/.
+  url: https://p.ad.gt/static/iab_tcf.json
+  status: 200
+  content_type: application/json
+  file: conformance/audigent-iab-tcf-device-storage.json
+  discovered_via: https://vendor-list.consensu.org/v3/vendor-list.json
+
+remedy: >-
+  Audigent could serve /.well-known/security.txt (RFC 9116) and
+  /.well-known/api-catalog (RFC 9727) from audigent.com and its Hadron API hosts,
+  and fix the catch-all that turns every missing path on audigent.com into a
+  200 — the soft-404 makes the entire host undiscoverable to any automated agent.

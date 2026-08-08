@@ -1,0 +1,156 @@
+generated: '2026-08-06'
+method: searched
+source: >-
+  https://docs.prebid.org/dev-docs/modules/userid-submodules/hadron.html ;
+  https://docs.prebid.org/dev-docs/modules/hadronRtdProvider.html ;
+  https://docs.prebid.org/dev-docs/analytics/audigent.html ;
+  https://github.com/prebid/Prebid.js ; https://cdn.hadronid.net/hadron.js
+
+summary: >-
+  Audigent ships no server-side SDK and publishes no client library to npm, PyPI
+  or any other registry (searched 2026-08-06 — zero first-party hits). Its
+  integration surface is client-side only: three open-source Prebid.js build-time
+  submodules that Audigent authors and maintains upstream, plus a hosted
+  JavaScript loader served from its own CDN. That is why this is recorded as
+  Components rather than Packages/SDKs — there is nothing a developer installs
+  from a package manager, only browser-side code compiled into a publisher's
+  Prebid build or injected by the loader.
+
+families:
+
+- family: Prebid.js submodules
+  distribution: build-time, compiled into a publisher's Prebid.js bundle
+  repository: https://github.com/prebid/Prebid.js
+  maintainer_contact: prebid@audigent.com
+  gvlid: 561
+  official: true
+  note: >-
+    First-party Audigent code living in the upstream Prebid.js repository, not in
+    an Audigent-owned repo. Audigent's own GitHub org (github.com/AuDigent) holds
+    20 public repositories and every one of them is a fork — it publishes no
+    original source of its own.
+  components:
+  - name: hadronIdSystem
+    kind: Prebid User ID submodule
+    docs: https://docs.prebid.org/dev-docs/modules/userid-submodules/hadron.html
+    source: https://github.com/prebid/Prebid.js/blob/master/modules/hadronIdSystem.js
+    build: gulp build --modules=userId,hadronIdSystem
+    calls: https://id.hadron.ad.gt/api/v1/pbhid
+    storage_key: auHadronId (localStorage)
+    exposes: hadronId
+    purpose: >-
+      Resolves and caches Audigent's cookieless Hadron ID for the browser and
+      publishes it into the Prebid auction's user-id set.
+
+  - name: hadronRtdProvider
+    kind: Prebid Real-Time Data provider submodule
+    docs: https://docs.prebid.org/dev-docs/modules/hadronRtdProvider.html
+    source: https://github.com/prebid/Prebid.js/blob/master/modules/hadronRtdProvider.js
+    storage_key: auHadronRtd (localStorage)
+    loads: https://cdn.hadronid.net/hadron.js
+    supersedes: haloRtdProvider
+    config_params:
+    - name: partnerId
+      type: number
+      required: true
+      description: Audigent Partner ID obtained from Audigent
+    - name: waitForIt
+      type: boolean
+      required: false
+      default: false
+      description: Delays the auction until the segment prefetch completes
+    - name: segmentCache
+      type: boolean
+      required: false
+      default: false
+      description: Enable localStorage caching of returned segments
+    - name: hadronIdUrl
+      type: string
+      required: false
+      description: Alternate hadronid endpoint URL
+    - name: handleRtd
+      type: function
+      required: false
+      description: Custom handler for augmenting bid requests with the returned data
+    example_config: |
+      pbjs.setConfig({
+          realTimeData: {
+              auctionDelay: auctionDelay,
+              dataProviders: [
+                  {
+                      name: "hadron",
+                      waitForIt: true,
+                      params: {
+                          segmentCache: false,
+                          partnerId: 1234
+                      }
+                  }
+              ]
+          }
+      });
+    purpose: >-
+      Merges Audigent identity, contextual targeting and audience segments into
+      the OpenRTB ortb2 object of a running Prebid auction.
+
+  - name: hadronAnalyticsAdapter
+    kind: Prebid Analytics adapter
+    docs: https://docs.prebid.org/dev-docs/analytics/audigent.html
+    source: https://github.com/prebid/Prebid.js/blob/master/modules/hadronAnalyticsAdapter.js
+    module_code: hadronAnalytics
+    calls: https://analytics.hadron.ad.gt/api/v1/analytics
+    version_tag: pbadgt0
+    config_params:
+    - name: partnerId
+      type: number
+      required: true
+    - name: events
+      type: array
+      required: false
+      description: Prebid auction events to track (e.g. auctionInit, auctionEnd)
+    purpose: Ships Prebid auction telemetry back to Audigent keyed to a partner ID.
+
+  - name: haloRtdProvider
+    kind: Prebid Real-Time Data provider submodule
+    status: deprecated
+    docs: https://docs.prebid.org/dev-docs/modules/haloRtdProvider.html
+    superseded_by: hadronRtdProvider
+    see: lifecycle/audigent-lifecycle.yml
+
+- family: Hosted JavaScript loader
+  distribution: hosted script tag / dynamically injected by hadronRtdProvider
+  official: true
+  components:
+  - name: hadron.js
+    url: https://cdn.hadronid.net/hadron.js
+    http_status: 200
+    content_type: text/plain
+    size_bytes: 59280
+    fetched: '2026-08-06'
+    query_params:
+    - partner_id
+    - _it
+    calls_observed:
+    - https://id.hadron.ad.gt
+    - https://id.hadron.ad.gt/log-hadron
+    - https://ids.ad.gt/api/v1/halo_match
+    - https://uid2.hadron.ad.gt/v1/hadron.json
+    - https://a.ad.gt/api/v1/u/matches/
+    purpose: >-
+      Audigent's own identity-sync bundle. Performs Hadron ID resolution, legacy
+      Halo cookie matching, UID2 interop and partner match-table calls from the
+      browser. This is the closest thing Audigent has to a published client
+      library, and it is minified hosted JavaScript rather than versioned,
+      installable source.
+
+packages_registries_searched:
+  date: '2026-08-06'
+  npm: 'registry.npmjs.org search "audigent" — 0 results; "hadron" hits are MongoDB Compass and unrelated projects'
+  result: >-
+    No first-party Audigent package on any public registry. No `Packages` or
+    `SDKs` pointer is emitted, because there is no installable client library.
+
+gaps:
+- No server-side SDK in any language.
+- No CLI.
+- No package-manager distribution; integration is a Prebid build flag or a script tag.
+- No versioned release artifact under Audigent's own control (the modules version with Prebid.js).

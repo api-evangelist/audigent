@@ -1,0 +1,108 @@
+generated: '2026-08-06'
+method: searched
+source: >-
+  https://docs.prebid.org/dev-docs/modules/haloRtdProvider.html ;
+  https://docs.prebid.org/dev-docs/modules/hadronRtdProvider.html ;
+  https://github.com/prebid/Prebid.js/blob/master/modules/hadronIdSystem.js ;
+  live probes 2026-08-06
+
+summary: >-
+  Audigent publishes no versioning policy, no deprecation policy, no SLA and no
+  status page on its own surface. It has, however, executed one real, documented
+  deprecation — the Halo to Hadron rebrand — and that deprecation was announced
+  upstream in the Prebid.js documentation with a named migration deadline. The
+  legacy Halo identifier is still returned by the live endpoint years later,
+  which is a compatibility signal worth recording.
+
+versioning:
+  scheme: URI path segment
+  current: v1
+  policy_published: false
+  observed:
+  - https://id.hadron.ad.gt/api/v1/pbhid
+  - https://seg.hadron.ad.gt/api/v1/rtd
+  - https://analytics.hadron.ad.gt/api/v1/analytics
+  - https://uid2.hadron.ad.gt/v1/hadron.json
+  note: >-
+    Every public endpoint has been on v1 for the life of the surface. Identifier
+    versioning happens inside the payload instead: the identity response carries
+    both `hadronId` and `hadronIdv2`, so the ID format was revised without a URI
+    version bump.
+
+deprecations:
+- id: halo-rtd-provider
+  status: deprecated
+  what: Audigent Halo Real-Time Data Provider (haloRtdProvider)
+  superseded_by: Audigent Hadron Real-Time Data Provider (hadronRtdProvider)
+  announced_at: https://docs.prebid.org/dev-docs/modules/haloRtdProvider.html
+  http_status: 200
+  quote: >-
+    "Audigent Halo has been rebranded as Audigent Hadron. Please review the
+    updated docs here: Audigent Hadron Real-time Data Submodule"
+  migration_deadline_quote: >-
+    "Please update your Halo references to Hadron before Prebid 7 is released."
+  deadline_style: tied to an upstream major release (Prebid 7), not a calendar date
+  headers: >-
+    No RFC 8594 Deprecation or Sunset response header is emitted; the notice is
+    prose on the docs page only.
+  fetched: '2026-08-06'
+
+- id: halo-id-field
+  status: retained-for-compatibility
+  what: the `haloId` field in the identity response
+  note: >-
+    Despite the Halo to Hadron rebrand, the live endpoint still returns `haloId`
+    alongside `hadronId` and `hadronIdv2`. The legacy cookie-match endpoint
+    https://ids.ad.gt/api/v1/halo_match is also still live (202, image/gif).
+    Old integrations have not been broken.
+  evidence:
+    url: https://id.hadron.ad.gt/api/v1/pbhid
+    http_status: 200
+    fetched: '2026-08-06'
+
+deprecation_policy:
+  published: false
+  note: >-
+    No standing deprecation policy document exists. The one deprecation on record
+    was announced in upstream project docs with a release-pegged migration
+    window. A `Deprecation` pointer is emitted on the strength of that documented,
+    dated, superseded-by notice — not on the strength of a policy page, which
+    Audigent does not have.
+
+status_page:
+  published: false
+  probed:
+  - url: https://status.audigent.com/
+    result: TLS handshake failure (no valid certificate; host does not serve)
+  - url: https://audigent.statuspage.io/
+    result: 200 but redirects to https://www.atlassian.com/software/statuspage (not a tenant)
+  note: >-
+    No status page. No `StatusPage` pointer is emitted.
+
+sla:
+  published: false
+  note: No public SLA, uptime commitment or support-tier document.
+
+changelog:
+  published: false
+  note: >-
+    No dated changelog on any Audigent host. The nearest thing is the corporate
+    blog at https://audigent.com/blog/ (announcements, not release notes) and the
+    upstream prebid/Prebid.js commit history for the three Audigent modules.
+    No `ChangeLog` pointer is emitted.
+
+environments:
+  production: https://id.hadron.ad.gt
+  staging_referenced: https://id.hadron.stage.ad.gt
+  staging_status: >-
+    Referenced inside the first-party hadron.js bundle but does not resolve in
+    public DNS (NXDOMAIN, probed 2026-08-06). Internal only; not a usable sandbox,
+    so sandbox/ is correctly absent.
+
+corporate:
+  acquired_by: Experian plc
+  acquired: '2024-12'
+  source: https://audigent.com/blog/experian-acquisition-of-audigent/
+  note: >-
+    Audigent continues to operate its own brand, domains and Prebid modules
+    post-acquisition; the surface profiled here is still Audigent's own.
