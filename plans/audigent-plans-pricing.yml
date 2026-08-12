@@ -1,0 +1,77 @@
+generated: '2026-08-12'
+method: searched
+source: >-
+  https://audigent.com/ (site navigation and footer, fetched 2026-08-12) ;
+  https://audigent.com/contact-us/ ; https://audigent.com/pricing (control-diffed) ;
+  https://docs.prebid.org/dev-docs/modules/userid-submodules/hadron.html
+
+plan_count: 0
+
+summary: >-
+  Audigent publishes no pricing of any kind — no plans page, no tiers, no rate
+  card, no free tier, no self-serve signup. Its whole commercial motion is
+  sales-led: publishers and advertisers are routed to a contact form or a "Request
+  Demo" button, and the Hadron integration itself requires a numeric partner_id
+  that Audigent issues manually during onboarding ("This is the Audigent Partner
+  ID obtained from Audigent" — Prebid docs). Recorded as an explicit zero with
+  evidence, not omitted.
+
+plans: []
+
+pricing_page:
+  published: false
+  probed:
+  - url: https://audigent.com/pricing
+    http_status: 200
+    verdict: does-not-exist
+    note: >-
+      audigent.com answers 200 with the marketing index for every unknown path.
+      This response is byte-identical to the control path
+      https://audigent.com/zzz-control-9999 (both 128,509 bytes, both titled
+      "Audigent | The Leading Data Activation, Curation and Identity Platform"),
+      so the 200 is a soft-404 and NOT evidence of a pricing page. Diffing
+      against the control is the only reliable read on this host.
+  - url: https://audigent.com/zzz-control-9999
+    http_status: 200
+    bytes: 128509
+    verdict: control — soft-404 signature
+  - url: https://audigent.com/contact-us/
+    http_status: 200
+    bytes: 107324
+    verdict: real page (distinct title "Contact Us | Audigent"), differs from control
+  navigation_checked:
+    url: https://audigent.com/
+    http_status: 200
+    fetched: '2026-08-12'
+    result: >-
+      No pricing, plans, packages or rate-card link appears anywhere in the main
+      navigation or the footer. Navigation is product pages (data-platform,
+      hadron-id, smart-pmps, contextual-pmps, cognitive-pmps, first-unit,
+      data-agency), insights (case-studies, content-library, blog), legal/privacy,
+      careers, and contact.
+
+commercial_model:
+  motion: sales-led / enterprise
+  entry_points:
+  - {kind: contact form, url: 'https://audigent.com/contact-us/', http_status: 200}
+  - {kind: request-demo CTA, url: 'https://audigent.com/', note: 'button in the site header, routes to the contact form'}
+  - {kind: partner onboarding, url: 'https://docs.prebid.org/dev-docs/modules/hadronRtdProvider.html', note: 'partnerId is issued by Audigent, not self-serve'}
+  - {kind: integration support, contact: prebid@audigent.com, source: 'https://docs.prebid.org/dev-docs/modules/userid-submodules/hadron.html'}
+  self_serve_signup: false
+  free_tier: false
+  metering_published: false
+  note: >-
+    Third-party marketplaces list Audigent products (e.g. SmartPMP on the
+    SoftwareOne marketplace) but none publishes an Audigent price, and a reseller
+    listing would not be Audigent's own published pricing in any case. Revenue on
+    the programmatic side flows through deal IDs and media spend rather than an
+    API price list, which is normal for this category — the zero here is a
+    faithful description of an ad-tech curation business, not a failure to look.
+
+pointers_emitted:
+  Plans: true
+  Pricing: false
+  reason: >-
+    The `pricing_link` check reads a `Pricing` pointer, which asserts the provider
+    publishes a pricing page. Audigent does not, and the 200 at /pricing is a
+    soft-404, so emitting one would be false credit.

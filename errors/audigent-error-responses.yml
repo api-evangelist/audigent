@@ -1,0 +1,128 @@
+generated: '2026-08-12'
+method: probed
+source: >-
+  live anonymous requests to id.hadron.ad.gt, seg.hadron.ad.gt,
+  analytics.hadron.ad.gt, a.ad.gt and api.audigent.com (2026-08-12)
+
+format: none
+problem_count: 0
+
+summary: >-
+  Audigent publishes no error reference, and the public Hadron endpoints have
+  effectively no error semantics to document. Every malformed, incomplete or
+  hostile request this pipeline sent came back HTTP 200 with a normal-looking
+  body: omitting the required partner_id returns a freshly minted identity,
+  passing partner_id=notanumber returns a freshly minted identity, and an
+  unsupported DELETE on the identity endpoint returns 200. The only error
+  observable at all is a bare text/plain 404 on an unrouted path. There is no
+  error envelope, no error code, no machine-readable type, no RFC 9457
+  problem+json, and no way for a caller to tell a bad request from a good one.
+  NO `ErrorCatalog` pointer is emitted in apis.yml — this file is the negative
+  record of a probe, not a claim that Audigent publishes error semantics.
+
+problems: []
+
+observed_behaviour:
+
+- id: missing-required-parameter
+  request: GET https://id.hadron.ad.gt/api/v1/pbhid
+  http_status: 200
+  content_type: application/json
+  body_shape: '{hadronId, hadronIdv2, haloId, cf}'
+  finding: >-
+    partner_id is documented as required by the Prebid module, yet omitting it
+    entirely still mints and returns a full identity payload. There is no
+    validation error surface.
+  fetched: '2026-08-12'
+
+- id: invalid-parameter-type
+  request: GET https://id.hadron.ad.gt/api/v1/pbhid?partner_id=notanumber
+  http_status: 200
+  content_type: application/json
+  body_shape: '{hadronId, hadronIdv2, haloId, cf}'
+  finding: >-
+    A non-numeric value in a numeric field is accepted silently. An agent cannot
+    detect a misconfigured partner_id from the response — a wrong integration
+    looks exactly like a correct one.
+  fetched: '2026-08-12'
+
+- id: unsupported-method
+  request: DELETE https://id.hadron.ad.gt/api/v1/pbhid
+  http_status: 200
+  finding: >-
+    No 405. The Allow header advertises "POST, OPTIONS, GET" but DELETE is
+    answered 200, so the advertised method set is not enforced.
+  fetched: '2026-08-12'
+
+- id: empty-segment-response
+  request: GET https://seg.hadron.ad.gt/api/v1/rtd (no partner_id)
+  http_status: 200
+  content_type: application/json
+  body: '{ "rtd": { "ortb2": { } } }'
+  finding: >-
+    An unknown or missing partner returns an empty but well-formed ortb2
+    envelope rather than an error. Callers must treat "no segments" and "bad
+    credentials" as the same response.
+  fetched: '2026-08-12'
+
+- id: analytics-always-ok
+  request: GET https://analytics.hadron.ad.gt/api/v1/analytics?partner_id=0
+  http_status: 200
+  content_type: application/json
+  body: '{"success": true}'
+  finding: >-
+    The analytics collector reports success for a request carrying no auction
+    payload at all. `success: true` is the only status field on the surface and
+    it is not conditional on anything the caller sent.
+  fetched: '2026-08-12'
+
+- id: unrouted-path
+  request: GET https://id.hadron.ad.gt/api/v1/nope
+  http_status: 404
+  content_type: text/plain; charset=utf-8
+  body: 'Not Found'
+  finding: >-
+    The one genuine error response on the surface. Bare text/plain, no body
+    schema, no code, no request id. seg.hadron.ad.gt behaves identically;
+    api.audigent.com returns a small HTML "Not Found" document instead;
+    a.ad.gt returns a JSON 404; analytics.hadron.ad.gt returns Cloudflare 530 on
+    unrouted paths.
+  fetched: '2026-08-12'
+
+- id: platform-api-anonymous
+  request: GET https://api.audigent.com/
+  http_status: 302
+  location: https://admin.audigent.com
+  finding: >-
+    The authenticated platform API does not return 401 with a WWW-Authenticate
+    challenge; it redirects anonymous callers to a browser login. An agent gets an
+    HTML login page, not an auth error it can act on.
+  fetched: '2026-08-12'
+  cross_reference: authentication/audigent-authentication.yml
+
+standards:
+  rfc9457_problem_details: false
+  rfc7807_problem_json: false
+  error_envelope: none
+  request_id_header: none observed
+  www_authenticate: not emitted on the authenticated host
+
+documentation:
+  published: false
+  note: >-
+    No error reference exists on any Audigent host, and the upstream Prebid docs
+    that serve as Audigent's developer reference document only module
+    configuration, not endpoint error handling.
+
+pointers_emitted:
+  ErrorCatalog: false
+  reason: >-
+    Recording an absence must not be scored as a presence. Audigent has no error
+    catalog; this artifact documents that, with evidence, and deliberately does
+    not claim the 8-point agent-readiness error-semantics signal.
+
+remedy: >-
+  Validating partner_id and returning a real 4xx with an RFC 9457
+  application/problem+json body would be the single highest-value change to this
+  surface for automated consumers: today a broken integration is
+  indistinguishable from a working one all the way through the response.

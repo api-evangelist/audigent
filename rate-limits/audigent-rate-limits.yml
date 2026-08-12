@@ -1,0 +1,100 @@
+generated: '2026-08-12'
+method: probed
+source: >-
+  live anonymous requests to https://id.hadron.ad.gt/api/v1/pbhid ,
+  https://seg.hadron.ad.gt/api/v1/rtd , https://analytics.hadron.ad.gt/api/v1/analytics ,
+  https://uid2.hadron.ad.gt/v1/hadron.json (2026-08-12) ;
+  https://docs.prebid.org/dev-docs/modules/userid-submodules/hadron.html ;
+  https://docs.prebid.org/dev-docs/modules/hadronRtdProvider.html
+
+limit_count: 0
+
+summary: >-
+  Audigent publishes no rate limits and its public endpoints emit no rate-limit
+  headers. Full response headers were captured from all four live public hosts on
+  2026-08-12: not one carries X-RateLimit-*, RateLimit-*, Retry-After or any
+  quota signal, and the Prebid documentation pages that serve as Audigent's only
+  developer reference say nothing about throttling, quotas or 429 handling. An
+  agent calling this surface has no runtime signal to back off on, and no
+  documented number to plan against. Recorded as an honest zero.
+
+limits: []
+
+response_headers_observed:
+  rate_limit_headers_present: false
+  checked_for:
+  - X-RateLimit-Limit
+  - X-RateLimit-Remaining
+  - X-RateLimit-Reset
+  - RateLimit-Limit
+  - RateLimit-Remaining
+  - RateLimit-Reset
+  - RateLimit-Policy
+  - Retry-After
+  hosts:
+  - host: id.hadron.ad.gt
+    url: https://id.hadron.ad.gt/api/v1/pbhid?partner_id=0&_it=prebid&t=1&src=id&domain=example.com
+    http_status: 200
+    content_type: application/json
+    headers_returned: [date, content-type, content-length, allow, access-control-allow-headers, access-control-allow-methods, access-control-allow-origin, server, cf-ray]
+    rate_limit_headers: []
+  - host: seg.hadron.ad.gt
+    url: https://seg.hadron.ad.gt/api/v1/rtd?partner_id=0&_it=prebid&t=1
+    http_status: 200
+    content_type: application/json
+    headers_returned: [date, content-type, content-length, server, access-control-allow-origin, allow, cf-cache-status, access-control-allow-headers, access-control-allow-methods, cf-ray]
+    rate_limit_headers: []
+  - host: analytics.hadron.ad.gt
+    url: https://analytics.hadron.ad.gt/api/v1/analytics
+    http_status: 200
+    content_type: application/json
+    headers_returned: [date, content-type, content-length, access-control-allow-origin, allow, access-control-allow-headers, server, cf-ray]
+    rate_limit_headers: []
+  - host: uid2.hadron.ad.gt
+    url: https://uid2.hadron.ad.gt/v1/hadron.json
+    http_status: 200
+    content_type: application/json; charset=utf8
+    headers_returned: [date, content-type, server, vary, access-control-allow-credentials, access-control-allow-headers, access-control-allow-methods, access-control-allow-origin, cf-cache-status, cf-ray]
+    rate_limit_headers: []
+
+exhaustion_behaviour:
+  status_code: unknown
+  note: >-
+    Not established. No 429 was observed and no throttling policy is documented.
+    This pipeline does not load-test a provider's production ad-serving
+    infrastructure to find the ceiling, so the exhaustion behaviour is recorded as
+    unknown rather than guessed.
+
+edge:
+  provider: Cloudflare
+  note: >-
+    All four hosts sit behind Cloudflare (server: cloudflare, cf-ray present), so
+    Cloudflare-level bot management or DDoS protection may throttle abusive
+    callers, but that is edge behaviour and not a published API rate limit. No
+    Cloudflare challenge was returned to any anonymous probe.
+
+documentation:
+  published: false
+  pages_checked:
+  - {url: 'https://docs.prebid.org/dev-docs/modules/userid-submodules/hadron.html', http_status: 200, mentions_rate_limits: false}
+  - {url: 'https://docs.prebid.org/dev-docs/modules/hadronRtdProvider.html', http_status: 200, mentions_rate_limits: false}
+  - {url: 'https://docs.prebid.org/dev-docs/analytics/audigent.html', http_status: 200, mentions_rate_limits: false}
+  note: >-
+    Audigent hosts no developer documentation of its own; audigent.com soft-404s
+    every unknown path (see well-known/audigent-well-known.yml), so no
+    Audigent-hosted rate-limit page could exist and be discoverable anyway.
+
+client_side_throttling:
+  note: >-
+    The only call-frequency control on this surface is client-side and lives in
+    Audigent's own Prebid modules: hadronIdSystem caches the resolved ID in
+    localStorage under `auHadronId` and hadronRtdProvider caches segment data
+    under `auHadronRtd`, so a browser does not re-call on every auction. That is a
+    caching convention, not a server-enforced limit.
+  source: conventions/audigent-conventions.yml
+
+remedy: >-
+  Audigent could emit IETF draft RateLimit-Limit / RateLimit-Remaining /
+  RateLimit-Reset headers on the Hadron endpoints and document a per-partner
+  quota. Today an integrator has no way to know whether they are near a ceiling
+  until traffic is silently dropped.

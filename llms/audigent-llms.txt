@@ -63,6 +63,27 @@ There is no API key, token or OAuth flow. The public endpoints take a non-secret
 `partner_id` issued during onboarding and visible in page source. The platform API is gated by
 a console session at admin.audigent.com. See authentication/audigent-authentication.yml.
 
+## Runtime semantics (probed 2026-08-12)
+
+- **No rate limits.** No X-RateLimit-*, RateLimit-* or Retry-After header on any public host,
+  and no documented quota. There is no runtime backoff signal at all.
+  See rate-limits/audigent-rate-limits.yml.
+- **No error semantics.** Every malformed request answers HTTP 200: omitting the required
+  `partner_id` still mints an identity, `partner_id=notanumber` still mints an identity, and
+  DELETE on the identity endpoint returns 200 despite an `Allow: POST, OPTIONS, GET` header.
+  The only real error is a bare `text/plain` 404 on an unrouted path. A broken integration is
+  indistinguishable from a working one. See errors/audigent-error-responses.yml.
+- **No pricing.** No plans, tiers or rate card; `audigent.com/pricing` is a soft-404 byte-identical
+  to the control path. Sales-led only, via https://audigent.com/contact-us/.
+  See plans/audigent-plans-pricing.yml.
+- **No package on any registry.** npm, PyPI, RubyGems, crates.io, NuGet, Maven Central,
+  pkg.go.dev and Packagist were all searched: zero Audigent-owned packages. Audigent's code
+  reaches developers as three modules inside upstream `prebid.js` (11.29.0, published
+  2026-08-06) and one unpinned CDN bundle at cdn.hadronid.net/hadron.js (Last-Modified
+  2025-12-18; no version string anywhere). Audigent-authored commits to those three Prebid
+  modules stopped in late 2024, around the Experian acquisition; everything since is Prebid
+  core housekeeping. See packages/audigent-packages.yml.
+
 ## Privacy, consent and compliance
 
 This is the richest part of Audigent's public surface and the part an agent should read first.

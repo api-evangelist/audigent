@@ -1,0 +1,137 @@
+generated: '2026-08-12'
+method: searched
+source: >-
+  registry.npmjs.org search + package metadata ; pypi.org ; rubygems.org ;
+  crates.io ; azuresearch-usnc.nuget.org ; search.maven.org ; proxy.golang.org ;
+  packagist.org ; https://cdn.hadronid.net/hadron.js (live HEAD) ;
+  https://api.github.com/repos/prebid/Prebid.js/commits (per-module history)
+
+summary: >-
+  Audigent publishes NO first-party package on any public registry. Every public
+  registry was searched by name on 2026-08-12 and every one returned zero
+  Audigent-owned results. Audigent's client code reaches developers by exactly
+  two routes, both recorded below: (1) three open-source Prebid.js submodules
+  that Audigent authors but that ship inside the upstream `prebid.js` npm
+  package, which Audigent does not own; and (2) one unpinned JavaScript bundle
+  served from Audigent's own CDN at cdn.hadronid.net. Neither is an installable
+  first-party SDK, so NO `SDKs` pointer is emitted in apis.yml — the
+  `sdk_count` checks would otherwise be credited for a library Audigent does not
+  publish.
+
+packages:
+
+- language: javascript
+  registry: npm
+  name: prebid.js
+  url: https://www.npmjs.com/package/prebid.js
+  install: npm install prebid.js
+  official: false
+  owner: Prebid.org (prebid/Prebid.js)
+  version: 11.29.0
+  published: '2026-08-06'
+  note: >-
+    Not an Audigent package. It is the upstream Prebid.js header-bidding library,
+    and it is the only registry-published artifact that carries Audigent's
+    first-party code: modules/hadronIdSystem.js, modules/hadronRtdProvider.js and
+    modules/hadronAnalyticsAdapter.js all ship inside it (verified present in
+    11.29.0 via unpkg, HTTP 200 for all three paths). A publisher does not
+    `npm install` an Audigent SDK — they compile these modules into their own
+    Prebid build with `gulp build --modules=userId,hadronIdSystem,hadronRtdProvider`.
+  x-evidence:
+    fetched: '2026-08-12'
+    registry_metadata: https://registry.npmjs.org/prebid.js
+    dist_tag_latest: 11.29.0
+    published: '2026-08-06'
+    weekly_downloads: 13216
+    downloads_window: '2026-08-03 to 2026-08-09'
+    module_presence_checked:
+    - {url: 'https://unpkg.com/prebid.js@11.29.0/modules/hadronIdSystem.js', http_status: 200, bytes: 5577}
+    - {url: 'https://unpkg.com/prebid.js@11.29.0/modules/hadronRtdProvider.js', http_status: 200, bytes: 5517}
+    - {url: 'https://unpkg.com/prebid.js@11.29.0/modules/hadronAnalyticsAdapter.js', http_status: 200, bytes: 4573}
+
+- language: javascript
+  registry: cdn
+  name: hadron.js
+  url: https://cdn.hadronid.net/hadron.js
+  install: '<script src="https://cdn.hadronid.net/hadron.js"></script> (loaded automatically by hadronRtdProvider)'
+  official: true
+  owner: Audigent
+  version: null
+  published: null
+  note: >-
+    First-party Audigent bundle, but the distribution is UNPINNED — the URL
+    carries no version segment and no `?v=` query, the file exposes no version
+    constant, and there is no registry metadata endpoint to query, so a consumer
+    cannot tell which build they are executing. That is the finding, not a gap in
+    this record. The only currency signal the host offers is HTTP metadata:
+    Last-Modified Thu, 18 Dec 2025 12:09:56 GMT, ETag "6943ef14-e790",
+    59,280 bytes, cache-control max-age=432000, served by Cloudflare.
+  x-evidence:
+    fetched: '2026-08-12'
+    url: https://cdn.hadronid.net/hadron.js
+    http_status: 200
+    content_type: text/plain
+    content_length: 59280
+    last_modified: 'Thu, 18 Dec 2025 12:09:56 GMT'
+    etag: '"6943ef14-e790"'
+    hosts_referenced_in_bundle:
+    - https://id.hadron.ad.gt
+    - https://id.hadron.stage.ad.gt
+    - https://ids.ad.gt
+    - https://uid2.hadron.ad.gt
+    - https://a.ad.gt
+
+registries_searched:
+- {registry: npm, query: audigent, results: 0, url: 'https://registry.npmjs.org/-/v1/search?text=audigent', checked: '2026-08-12'}
+- {registry: npm, query: hadronid, results: 0, checked: '2026-08-12'}
+- {registry: pypi, query: audigent, http_status: 404, checked: '2026-08-12'}
+- {registry: pypi, query: hadronid, http_status: 404, checked: '2026-08-12'}
+- {registry: rubygems, query: audigent, results: 0, checked: '2026-08-12'}
+- {registry: crates.io, query: audigent, results: 0, checked: '2026-08-12'}
+- {registry: nuget, query: audigent, results: 0, checked: '2026-08-12'}
+- {registry: maven-central, query: audigent, results: 0, checked: '2026-08-12'}
+- {registry: pkg.go.dev, query: github.com/audigent, http_status: 404, checked: '2026-08-12'}
+- {registry: packagist, query: audigent, first_party_results: 0, checked: '2026-08-12', note: '114 unrelated substring matches, none Audigent-owned'}
+
+first_party_module_maintenance:
+  note: >-
+    The three Audigent modules live upstream, so their maintenance history is
+    public and dated — and it is the strongest decay signal available for this
+    provider. Audigent-side engineering on them stopped in late 2024, immediately
+    around the December 2024 Experian acquisition. Every commit since is
+    Prebid-core housekeeping by Prebid maintainers (lint rules, the Prebid 9/10/11
+    breaking-change sweeps) or a third-party contribution, not Audigent feature
+    work.
+  source: https://api.github.com/repos/prebid/Prebid.js/commits?path=modules/<module>.js
+  checked: '2026-08-12'
+  modules:
+  - module: hadronIdSystem.js
+    last_commit: '2026-06-10'
+    last_commit_subject: 'Core: Turn on semi linter rule (#15061)'
+    last_commit_by: Prebid core maintainer
+    last_audigent_authored_commit: '2024-11-05'
+    last_audigent_authored_subject: 'HadronId System : not use localStorage for writing on it (#12378)'
+  - module: hadronRtdProvider.js
+    last_commit: '2026-06-10'
+    last_commit_subject: 'Core: Turn on semi linter rule (#15061)'
+    last_commit_by: Prebid core maintainer
+    last_audigent_authored_commit: '2024-11-20'
+    last_audigent_authored_subject: 'Hadron RTD : cleaning things up (#12480)'
+  - module: hadronAnalyticsAdapter.js
+    last_commit: '2026-03-12'
+    last_commit_subject: 'Prebid 11.0 (#14433)'
+    last_commit_by: Prebid core maintainer
+    last_audigent_authored_commit: null
+    last_audigent_authored_note: >-
+      No commit in the visible history is attributable to a named Audigent
+      engineer; the module has only received cross-cutting Prebid core changes
+      since 2023.
+
+pointers_emitted:
+  Packages: true
+  SDKs: false
+  reason: >-
+    No first-party installable client library exists on any registry. Emitting an
+    `SDKs` pointer would credit Audigent with an SDK it does not publish.
+
+cross_reference: components/audigent-components.yml

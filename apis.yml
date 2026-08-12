@@ -17,7 +17,7 @@ x-type: company
 x-source: harvest:secondary-market
 specificationVersion: '0.20'
 created: '2026-08-06'
-modified: '2026-08-06'
+modified: '2026-08-12'
 tags:
 - Company
 - Advertising
@@ -150,12 +150,18 @@ common:
   url: components/audigent-components.yml
 - type: DomainSecurity
   url: security/audigent-domain-security.yml
+- type: Packages
+  url: packages/audigent-packages.yml
+- type: Plans
+  url: plans/audigent-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/audigent-rate-limits.yml
 - type: LLMsTxt
   url: llms/audigent-llms.txt
 - type: SecondaryMarket
   url: https://forgeglobal.com/audigent_stock/
 x-enrichment:
-  date: '2026-08-06'
+  date: '2026-08-12'
   status: enriched
-  artifacts_added: 10
+  artifacts_added: 4
   pass: local-v1
