@@ -11,6 +11,19 @@ description: 'Audigent is a data activation, curation and identity platform for 
   (hadronIdSystem, hadronRtdProvider, hadronAnalyticsAdapter) that Audigent authors
   and maintains upstream in the Prebid.js project. Audigent is IAB Europe TCF Global
   Vendor List vendor 561 and publishes a machine-readable device-storage disclosure.'
+deliveryModel:
+  model: open-core
+  license: Apache-2.0
+  open_source: true
+  commercial: true
+  callable_host: false
+  label: Open core · an OSS project plus a commercial hosted product
+  confidence: high
+  source:
+  - license
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 image: https://avatars.githubusercontent.com/u/16336664?v=4
 url: https://raw.githubusercontent.com/api-evangelist/audigent/refs/heads/main/apis.yml
 x-type: company
