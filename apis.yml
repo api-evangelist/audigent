@@ -52,6 +52,19 @@ tags:
 - Data
 - Identity
 - Programmatic
+- Audiences
+- Marketing
+- Privacy
+- Prebid
+- Header Bidding
+- Data Curation
+tags_raw:
+- Company
+- Advertising
+- AdTech
+- Data
+- Identity
+- Programmatic
 - Audience
 - Marketing
 - Privacy
@@ -85,6 +98,10 @@ apis:
   humanURL: https://docs.prebid.org/dev-docs/modules/hadronRtdProvider.html
   baseURL: https://seg.hadron.ad.gt/api/v1
   tags:
+  - AdTech
+  - Audiences
+  - Prebid
+  tags_raw:
   - AdTech
   - Audience
   - Prebid
